@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<title>Balım'a</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  * { box-sizing:border-box; font-family: Arial, Helvetica, sans-serif; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #556B2F;
+    background-image:
+      radial-gradient(circle, #8B4513 15%, transparent 16%),
+      radial-gradient(circle, #6B8E23 5%, transparent 6%),
+      radial-gradient(circle, #A0522D 10%, transparent 11%);
+    background-size: 80px 80px, 40px 40px, 100px 100px;
+    background-position: 0 0, 20px 30px, 50px 50px;
+    overflow-x: hidden;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    max-width: 900px;
+    width: 100%;
+    padding: 16px;
+  }
+
+  .card {
+    background: #f3efe6;
+    border-radius: 18px;
+    padding: 18px 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+    cursor: pointer;
+    transition: transform .2s, box-shadow .25s;
+    will-change: transform;
+    position: relative;
+    overflow: visible;
+  }
+
+  .card:hover { transform: scale(1.05); }
+
+  .card p {
+    margin: 0;
+    display: none;
+    color: #6B4C3B;
+    line-height: 1.45;
+    font-weight: 600;
+    font-style: italic;
+    white-space: pre-wrap;
+  }
+
+  /* kalp atışı animasyonu */
+  @keyframes beat {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.05); }
+    40% { transform: scale(0.98); }
+    60% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  .card.open {
+    animation: beat .35s ease;
+    box-shadow:
+      0 10px 25px rgba(0,0,0,.15),
+      0 0 18px rgba(255, 140, 180, .45);
+  }
+
+  .card.open p { display: block; }
+  .card.open .hint { display: none; }
+
+  .hint {
+    font-size: 13px;
+    color: #3b2f2f;
+    opacity: .7;
+    margin-top: 8px;
+  }
+
+  /* konfeti canvas */
+  #confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* arka plan hafif kalpler */
+  .heart {
+    position: fixed;
+    pointer-events: none;
+    transform: translateY(0);
+    animation: floatUp 8s linear forwards;
+    z-index: 10;
+    user-select: none;
+    font-family: inherit;
+    will-change: transform, opacity;
+  }
+
+  @keyframes floatUp {
+    from { transform: translateY(0) scale(1); opacity: .18; }
+    30%  { opacity: .14; }
+    70%  { opacity: .08; }
+    to   { transform: translateY(-120vh) scale(.9); opacity: 0; }
+  }
+
+  /* final screen */
+  #finalScreen{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #fff;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: .6s;
+    z-index: 10001; /* konfeti üstünde */
+    backdrop-filter: blur(4px);
+    padding: 24px;
+    line-height: 1.2;
+  }
+
+  #finalScreen.show{
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* responsive küçük yazı için */
+  @media (max-width:420px){
+    #finalScreen { font-size: 20px; padding: 20px; }
+    .cards { padding: 12px; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cards">
+  <div class="card"><p>💜 Aşka inanmayanlara seni anlattım</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🤍 Trust me, I got nothin' for you other than love</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🌟 Birden durdum, bak içimden geldi Nası' da afalladım Çünkü sen varsın diye</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>👁️ Ben o yâre gözlerimi veririm</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🤗 Sadece sen kavra belimi</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>📝 En güzel şiirlerimle kaleme adını sayıklatırım, odamın hayaletisin sessizliğine aşığım</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>😊 Ve ben senin gibi gülen biri tanımadım</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🔥 Ben yakın sen uzak, ya sen yakınlarımda ben ırak, ansızın sızım yakardı en derinden, uşmam elzem, ben bu yangını söndürmem</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🌷 Hayatın içinde bir aşk buldum</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🗝️ Gözlerin başka dünyanın merkez anahtarıydı</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🌹 Sevgilim saçların zannetme solmaz, dünyada sevenler bahtiyar olmaz</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🥰 Mutluyum, sen bana sahipken!</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>💓 Arıyo' kalbim atıyo' tık tık, var bi' telaş dön yanıma gel</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>💞 Eu amo-te mais do que tudo, meu amor</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🎨 Aslında her şey sensin ve sensin aradığın en güzel rengin bil bu fakirin gönlü zengin</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🤍 İyi ki varsın yanımda</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🏳️ Ben güçlü biriydim bi' tek sana yenildim</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🌗 Hem yakın hem uzak bi' his gibisin</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>💗 Sensiz geçen günlerin kazası yok be sevgilim</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🙈 Senden başkası kimmiş, neymiş bilmiyorum</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🎶 Biliyosun en güzel şarkı sana\nOnları boşver dertleri para\nGözlerin kitledi beni sana</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>💝 Bul seni getir bana, hediyem ol\naklımın odaları senle doldu taştı</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>👀 I close my eyes, and all I see is you</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🎧 Gündüzümde gecemdesin çalmasın, söylenmesin sen benim şarkılarımsın</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🌕 Deli gönlüm aşkı sevdi gözlerinde huzura kavuştu ruhum da bedenim de</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🌸 Sanma üç günlük bu hislerim ben bur'da her gün seni beklerim</p><div class="hint">dokun / tıkla</div></div>
+  <div class="card"><p>🤎 Farkında değil misin? Her şeyim oldun sen benim</p><div class="hint">dokun / tıkla</div></div>
+</div>
+
+<!-- konfeti canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- final screen (metin isteğine göre) -->
+<div id="finalScreen">Seni Herşeyden Çok Seviyorum Balım🤍</div>
+
+<script>
+  // kart seçimi, açma, otomatik scroll, konfeti
+  const cards = document.querySelectorAll('.card');
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      // 7) Tekrar kapanmasın: zaten açıksa çık
+      if (card.classList.contains('open')) return;
+
+      // aç
+      card.classList.add('open');
+
+      // otomatik kaydırma
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // konfeti patlat
+      launchConfetti(card);
+
+      // kontrol: hepsi açıldıysa final ekranı göster
+      checkAllOpened();
+    });
+  });
+
+  function checkAllOpened(){
+    const opened = document.querySelectorAll(".card.open").length;
+    const total  = document.querySelectorAll(".card").length;
+    if (opened === total) {
+      // küçük gecikme verelim ki son animasyon gözükebilsin
+      setTimeout(()=> {
+        document.getElementById("finalScreen").classList.add("show");
+      }, 400);
+    }
+  }
+
+  // konfeti fonksiyonu (konfeti 3.5s sonra sönmeye başlar, 0.5s içinde kaybolur)
+  function launchConfetti(card) {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+
+    const onResize = () => resizeCanvas();
+    window.addEventListener('resize', onResize);
+
+    const rect = card.getBoundingClientRect();
+    const startX = rect.left + rect.width/2;
+    const startY = rect.top + rect.height/2;
+
+    const confettiCount = 50;
+    const confettis = [];
+
+    for (let i = 0; i < confettiCount; i++) {
+      const angle = Math.random()*Math.PI - Math.PI/2;
+      const speed = Math.random()*6 + 2;
+
+      confettis.push({
+        x: startX,
+        y: startY,
+        w: Math.random()*8 + 4,
+        h: Math.random()*12 + 6,
+        color: `hsl(${Math.random()*360},100%,50%)`,
+        angle: angle,
+        speed: speed,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        gravity: 0.12 + Math.random()*0.06,
+        born: performance.now()
+      });
+    }
+
+    let animationFrame;
+    const fadeDelay = 3500;
+    const fadeDuration = 500;
+    const totalDuration = fadeDelay + fadeDuration + 50;
+    let stopped = false;
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const now = performance.now();
+      let anyVisible = false;
+
+      confettis.forEach(c => {
+        const elapsed = now - c.born;
+        let alpha = 1;
+        if (elapsed > fadeDelay) alpha = Math.max(0, 1 - (elapsed - fadeDelay) / fadeDuration);
+        if (alpha <= 0) return;
+
+        anyVisible = true;
+        c.vy += c.gravity;
+        c.x += c.vx;
+        c.y += c.vy;
+        c.vx *= 0.995;
+        c.vy *= 0.995;
+        c.angle += 0.15;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(c.x, c.y);
+        ctx.rotate(c.angle);
+        ctx.fillStyle = c.color;
+        ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h);
+        ctx.restore();
+      });
+
+      if (anyVisible && !stopped) {
+        animationFrame = requestAnimationFrame(draw);
+      } else {
+        // temizlik
+        stopped = true;
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        window.removeEventListener('resize', onResize);
+      }
+    }
+
+    draw();
+
+    const stopTimer = setTimeout(()=> {
+      stopped = true;
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      window.removeEventListener('resize', onResize);
+    }, totalDuration);
+
+    return {
+      stop: () => {
+        stopped = true;
+        clearTimeout(stopTimer);
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        window.removeEventListener('resize', onResize);
+      }
+    };
+  }
+
+  /* Arka planda daha fazla kalp üreten bölüm */
+  const heartsInterval = setInterval(()=> {
+    // her turda rastgele 2-5 kalp üret
+    const count = 2 + Math.floor(Math.random()*4); // 2..5
+    for (let i = 0; i < count; i++) {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = "❤";
+      h.style.left = (Math.random()*100) + "vw";
+      h.style.bottom = "-20px";
+      const size = 8 + Math.random()*28; // px
+      h.style.fontSize = size + "px";
+      h.style.opacity = (0.06 + Math.random()*0.18).toString();
+      // hafif yatay sapma için translateX animasyonu via transform initial
+      const drift = (Math.random()*40 - 20); // -20 .. 20 vw
+      h.style.transform = `translateY(0) translateX(0)`;
+      document.body.appendChild(h);
+
+      // küçük ek JS animasyonu ile yatay kayma (CSS floatUp handles vertical)
+      // kullanıcının CPU'sunu çok yormadan hafif CSS transition benzeri hareket
+      requestAnimationFrame(()=> {
+        h.style.transition = `transform 8s linear, opacity 3s linear`;
+        h.style.transform = `translateY(-120vh) translateX(${drift}px)`;
+        // opacity azalması zaten keyframe'de ama setTransition helps on some browsers
+      });
+
+      // 8.5s sonra temizle
+      setTimeout(()=> {
+        if (h && h.parentNode) h.parentNode.removeChild(h);
+      }, 8500);
+    }
+  }, 300); // eskisinden daha sık: ~300ms
+
+  // temizleme on unload
+  window.addEventListener('beforeunload', () => {
+    clearInterval(heartsInterval);
+  });
+
+</script>
+
+</body>
+</html>
